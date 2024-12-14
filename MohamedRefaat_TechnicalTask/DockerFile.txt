@@ -1,0 +1,22 @@
+﻿# Use an official ASP.NET Core runtime as the base image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+# Use the .NET SDK for building the application
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["MohamedRefaat_TechnicalTask.csproj", "./"]
+RUN dotnet restore "./MohamedRefaat_TechnicalTask.csproj"
+COPY . .
+RUN dotnet build "MohamedRefaat_TechnicalTask.csproj" -c Release -o /app/build
+
+# Publish the application
+FROM build AS publish
+RUN dotnet publish "MohamedRefaat_TechnicalTask.csproj" -c Release -o /app/publish
+
+# Use the runtime image for the final container
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "MohamedRefaat_TechnicalTask.dll"]

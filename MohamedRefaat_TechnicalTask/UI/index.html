@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Person Details</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        input {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Person Details</h1>
+    <input type="text" id="filter" placeholder="Filter by Name..." />
+    <button onclick="fetchData()">Search</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th> Name</th>
+                <th>Phone</th>
+                <th> Address</th>
+            </tr>
+        </thead>
+        <tbody id="person-list">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        const apiUrl = 'https://localhost:7161/api/persons'; // Replace with your API URL
+
+        // Function to fetch data from the API
+        async function fetchData() {
+            const filter = document.getElementById('filter').value;
+            const url = `${apiUrl}?name=${encodeURIComponent(filter)}`;
+            console.log("API Request URL: ", url); // Log the URL to check if it's correct
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                console.error("Error fetching data:", response.statusText); // Log any errors
+                return;
+            }
+
+            const data = await response.json();
+
+            const tableBody = document.getElementById('person-list');
+            tableBody.innerHTML = '';
+
+            data.forEach(person => {
+                const row = `
+                <tr>
+                    <td>${person.firstName} ${person.lastName}</td>
+                    <td>${person.telephoneNumber}</td>
+                    <td>${person.fullAddress}</td>
+                </tr>
+            `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+
+        // Call fetchData when the page is loaded
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
